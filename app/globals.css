@@ -72,3 +72,46 @@ body {
 ::-webkit-scrollbar-track {
   background: rgba(255,255,255,0.05);
 }
+.prose {
+  @apply text-gray-300 leading-relaxed;
+}
+.prose h1 {
+  @apply text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-6;
+}
+.prose h2 {
+  @apply text-3xl font-semibold text-cyan-300 mt-12 mb-4;
+}
+.prose h3 {
+  @apply text-2xl font-semibold text-white mt-8 mb-3;
+}
+.prose p {
+  @apply my-5 text-gray-300 leading-relaxed;
+}
+.prose a {
+  @apply text-cyan-400 hover:text-cyan-300;
+}
+.prose table {
+  @apply border-collapse border border-gray-700 my-6 text-sm;
+}
+.prose th, .prose td {
+  @apply border border-gray-700 px-3 py-2;
+}
+.prose th {
+  @apply bg-gray-800 text-cyan-300 font-semibold;
+}
+/* Make blog tables scrollable on mobile */
+.prose table {
+  @apply w-full border-collapse border border-gray-700 text-sm my-6;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.prose thead {
+  @apply bg-gray-800 text-cyan-300;
+}
+
+.prose th,
+.prose td {
+  @apply border border-gray-700 px-3 py-2 text-left;
+}
