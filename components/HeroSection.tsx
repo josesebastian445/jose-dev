@@ -11,20 +11,50 @@ export default function HeroSection() {
     email: "",
     website: "",
     message: "",
+    _hp: "", // honeypot
   });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: any) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => {
-      setShowForm(false);
-      setSent(false);
-      setFormData({ name: "", email: "", website: "", message: "" });
-    }, 2000);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/send-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Failed to send request. Try again later.");
+        return;
+      }
+
+      setSent(true);
+      setTimeout(() => {
+        setShowForm(false);
+        setSent(false);
+        setFormData({
+          name: "",
+          email: "",
+          website: "",
+          message: "",
+          _hp: "",
+        });
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong while sending your request.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -171,7 +201,6 @@ export default function HeroSection() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* 🔹 Pulsing Glow Background */}
             <motion.div
               className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.1)_0%,rgba(0,0,0,0.9)_70%)]"
               animate={{
@@ -185,7 +214,6 @@ export default function HeroSection() {
               }}
             />
 
-            {/* 🔹 Popup Card */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 40 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -249,14 +277,25 @@ export default function HeroSection() {
                     className="w-full rounded-lg bg-white/[0.05] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-cyan-400 focus:outline-none resize-none"
                   />
 
+                  {/* Hidden honeypot */}
+                  <input
+                    type="text"
+                    name="_hp"
+                    autoComplete="off"
+                    tabIndex={-1}
+                    className="hidden"
+                    value={formData._hp}
+                    onChange={handleChange}
+                  />
+
                   <motion.button
                     type="submit"
+                    disabled={loading}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-cyan-500/20 border border-cyan-400/40 py-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/30 hover:text-white transition"
+                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-cyan-500/20 border border-cyan-400/40 py-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/30 hover:text-white transition disabled:opacity-50"
                   >
-                    <Send size={14} />
-                    Submit Request
+                    {loading ? "Sending..." : <><Send size={14} /> Submit Request</>}
                   </motion.button>
                 </form>
               )}

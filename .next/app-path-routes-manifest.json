@@ -1,1 +1,7 @@
-{"/_not-found/page":"/_not-found","/page":"/","/blog/page":"/blog","/blog/[slug]/page":"/blog/[slug]"}
+{
+  "/api/send-audit/route": "/api/send-audit",
+  "/_not-found/page": "/_not-found",
+  "/page": "/",
+  "/content/blog/[slug]/page": "/content/blog/[slug]",
+  "/content/blog/page": "/content/blog"
+}
