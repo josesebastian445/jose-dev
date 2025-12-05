@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Prevent static optimization — Cloudflare will treat as runtime API
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    // Create client ONLY at runtime — not during build
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const { name, email, website, message, _hp } = await req.json();
 
-    // Honeypot field (spam bot protection)
+    // Honeypot for spam bots
     if (_hp) return NextResponse.json({ ok: true });
 
-    // Validate required fields
+    // Validation
     if (!name || !email || !website) {
       return NextResponse.json(
         { ok: false, error: "Missing required fields" },
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
       from: process.env.AUDIT_FROM_EMAIL!,
       to: process.env.AUDIT_TO_EMAIL!,
       subject: `New Audit Request — ${website}`,
-      replyTo: email, // ✅ FIXED — correct camelCase
+      replyTo: email,
       text: [
         `New Free Audit Request`,
         `--------------------------------`,
@@ -47,7 +51,7 @@ export async function POST(req: Request) {
       from: process.env.AUDIT_FROM_EMAIL!,
       to: email,
       subject: `Got your audit request for ${website}`,
-      replyTo: process.env.AUDIT_TO_EMAIL!, // user can reply to you
+      replyTo: process.env.AUDIT_TO_EMAIL!,
       text: `Hi ${name},
 
 Thanks for requesting a free website audit. I’ll review your site and send a summary covering:
