@@ -1,18 +1,17 @@
-import { NextResponse } from "next/server";
-import { Resend } from "resend";
-
-// 🚨 Prevent Next.js from trying to pre-render or analyze this route at build time
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+import { NextResponse } from "next/server";
+
 export async function POST(req: Request) {
   try {
-    // Create client ONLY at runtime — not during build
+    // 🔥 FIX: Dynamically import Resend ONLY inside this runtime function
+    const { Resend } = await import("resend");
+
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { name, email, website, message, _hp } = await req.json();
 
-    // Honeypot field
     if (_hp) return NextResponse.json({ ok: true });
 
     if (!name || !email || !website) {
@@ -22,27 +21,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // ⭐ Send admin email
+    // Admin email
     await resend.emails.send({
       from: process.env.AUDIT_FROM_EMAIL!,
       to: process.env.AUDIT_TO_EMAIL!,
       subject: `New Audit Request — ${website}`,
       replyTo: email,
-      text: [
-        `New Free Audit Request`,
-        `--------------------------------`,
-        `Name:    ${name}`,
-        `Email:   ${email}`,
-        `Website: ${website}`,
-        ``,
-        `Message:`,
-        `${message || "(none)"}`,
-        ``,
-        `Submitted: ${new Date().toISOString()}`
-      ].join("\n"),
+      text: `
+Name: ${name}
+Email: ${email}
+Website: ${website}
+
+Message:
+${message || "(none)"}
+
+Submitted: ${new Date().toISOString()}
+      `
     });
 
-    // ⭐ Auto-reply to user
+    // Auto-reply
     await resend.emails.send({
       from: process.env.AUDIT_FROM_EMAIL!,
       to: email,
@@ -50,16 +47,9 @@ export async function POST(req: Request) {
       replyTo: process.env.AUDIT_TO_EMAIL!,
       text: `Hi ${name},
 
-Thanks for requesting a free website audit. I’ll review your site and send a summary covering:
+Thanks for requesting a free website audit. I’ll review your site and send a summary soon.
 
-• Performance (Core Web Vitals, Lighthouse)
-• Security (headers, WAF/CDN, SSL, exposure)
-• SEO technical health
-
-Talk to you soon!
-
-— Jose
-`,
+— Jose`
     });
 
     return NextResponse.json({ ok: true });
