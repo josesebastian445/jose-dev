@@ -3,17 +3,19 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
+// Generate static params for SSG
 export async function generateStaticParams() {
-  return getAllPosts().map((p) => ({ slug: p.slug }));
+  const posts = getAllPosts();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
+// Metadata generation
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getPost(params.slug);
   if (!post) return {};
 
   const { data } = post;
-  const title =
-    data.metaTitle || `${data.title} | Jose Cyber`;
+  const title = data.metaTitle || `${data.title} | Jose Cyber`;
   const description =
     data.metaDescription ||
     data.excerpt ||
@@ -50,11 +52,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
+// SINGLE BLOG PAGE
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const { data, content } = getPost(params.slug);
+  const post = getPost(params.slug);
 
-  if (!data) notFound();
+  // If file not found → show 404
+  if (!post || !post.data) return notFound();
 
+  const { data, content } = post;
+
+  // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -137,8 +144,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </section>
 
       {/* Blog Content */}
-      <section className="mx-auto max-w-3xl px-6 py-12 prose prose-invert prose-headings:text-cyan-300 prose-a:text-cyan-400 hover:prose-a:text-white prose-blockquote:border-cyan-300 prose-blockquote:bg-white/5 prose-blockquote:text-white/70">
-<div>{content}</div>
+      <section className="mx-auto max-w-3xl px-6 py-12 prose prose-invert">
+        <MDXRemote source={content} />
       </section>
 
       {/* Footer */}
