@@ -86,14 +86,14 @@ export default function ContactSection() {
             <div className="flex items-center gap-3">
               <Mail size={16} className="text-cyan-300" />
               <span className="text-white/80 font-medium">
-                hello@joseviews.com
+                hello@websitefreelancer.in
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               <Phone size={16} className="text-violet-300" />
               <span className="text-white/80 font-medium">
-                +971 50 123 4567
+                +971 58 242 8109
               </span>
             </div>
 
