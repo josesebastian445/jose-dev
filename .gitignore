@@ -3,4 +3,5 @@
 node_modules
 *.log
 package-lock.json
-tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo.env.local
+.env.*.local
