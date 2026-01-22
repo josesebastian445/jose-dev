@@ -8,8 +8,13 @@ export async function getPayloadClient() {
     return payload
   }
 
-  payload = await getPayload({ config })
-  return payload
+  try {
+    payload = await getPayload({ config })
+    return payload
+  } catch (error) {
+    console.error('Failed to initialize Payload:', error)
+    return null
+  }
 }
 
 export interface Post {
@@ -32,34 +37,50 @@ export interface Post {
 }
 
 export async function getAllPublishedPosts(): Promise<Post[]> {
-  const payload = await getPayloadClient()
+  try {
+    const payload = await getPayloadClient()
+    if (!payload) {
+      return []
+    }
 
-  const { docs } = await payload.find({
-    collection: 'posts',
-    where: {
-      status: {
-        equals: 'published',
+    const { docs } = await payload.find({
+      collection: 'posts',
+      where: {
+        status: {
+          equals: 'published',
+        },
       },
-    },
-    sort: '-publishedDate',
-    limit: 100,
-  })
+      sort: '-publishedDate',
+      limit: 100,
+    })
 
-  return docs as Post[]
+    return docs as Post[]
+  } catch (error) {
+    console.error('Failed to fetch posts:', error)
+    return []
+  }
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const payload = await getPayloadClient()
+  try {
+    const payload = await getPayloadClient()
+    if (!payload) {
+      return null
+    }
 
-  const { docs } = await payload.find({
-    collection: 'posts',
-    where: {
-      slug: {
-        equals: slug,
+    const { docs } = await payload.find({
+      collection: 'posts',
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-    limit: 1,
-  })
+      limit: 1,
+    })
 
-  return docs.length > 0 ? (docs[0] as Post) : null
+    return docs.length > 0 ? (docs[0] as Post) : null
+  } catch (error) {
+    console.error('Failed to fetch post:', error)
+    return null
+  }
 }

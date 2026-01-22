@@ -32,7 +32,6 @@ export default buildConfig({
     user: 'users',
     meta: {
       titleSuffix: '- Jose Cyber Pro CMS',
-      favicon: '/favicon-32x32.png',
     },
   },
 
