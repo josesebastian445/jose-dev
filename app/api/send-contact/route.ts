@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { getDatabase } from "@/app/lib/mongodb";
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +21,17 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Save to MongoDB
+    const db = await getDatabase();
+    await db.collection('contact_submissions').insertOne({
+      name,
+      email,
+      subject,
+      message,
+      submittedAt: new Date(),
+      ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
+    });
 
     // Admin email
     await resend.emails.send({
