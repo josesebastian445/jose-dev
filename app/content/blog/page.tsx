@@ -1,4 +1,4 @@
-import { getAllPosts } from "@/app/lib/posts";
+import { getAllPublishedPosts } from "@/app/lib/payload-client";
 import BlogCard from "@/components/BlogCard";
 import BlogHero from "@/components/BlogHero";
 
@@ -8,8 +8,8 @@ export const metadata = {
     "Insights on performance, security, and futuristic web design — powered by Jose Cyber.",
 };
 
-export default function BlogPage() {
-  const posts = getAllPosts();
+export default async function BlogPage() {
+  const posts = await getAllPublishedPosts();
 
   return (
     <main
@@ -41,7 +41,7 @@ export default function BlogPage() {
       <div className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-2 lg:grid-cols-3 gap-10">
         {posts.length === 0 ? (
           <p className="col-span-full text-center text-gray-400">
-            No blog posts found. Add `.mdx` files under /content/blog
+            No blog posts found. Add posts via the CMS at /admin
           </p>
         ) : (
           posts.map((p) => <BlogCard key={p.slug} post={p} />)
