@@ -3,6 +3,7 @@
 import "./globals.css";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import HeaderNav from "@/components/HeaderNav";
 import GlowGrid from "@/components/GlowGrid";
 import CursorGlow from "@/components/CursorGlow";
@@ -38,6 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </motion.main>
         </AnimatePresence>
+
+        {/* 📊 Vercel Speed Insights */}
+        <SpeedInsights />
       </body>
     </html>
   );
